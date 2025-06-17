@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 void main() {
@@ -6,41 +8,68 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
-  // This widget is the root of your application.
+  
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueGrey),
-      ),
-      home: const MyHomePage(title: 'Flutter Puzzle Mobile'),
+      home: const PuzzlePage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
+class PuzzlePage extends StatefulWidget {
+  const PuzzlePage({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<PuzzlePage> createState() => _PuzzlePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _PuzzlePageState extends State<PuzzlePage> {
+  final Stopwatch _stopwatch = Stopwatch();
+  Timer? _timer;
+  String _elapsed = "0:00";
+
+  void _startTimer() {
+    _stopwatch.start();
+    _timer = Timer.periodic(Duration(milliseconds: 100), (_) {
+      setState(() {
+        _elapsed = (_stopwatch.elapsed.inMilliseconds/1000).toStringAsFixed(3);
+      });
+    });
+  }
+
+  void _stopTimer() {
+    _timer?.cancel();
+    _stopwatch.stop();
+  }
+
+  void _resetTimer() {
+    _stopTimer();
+    setState(() {
+      _stopwatch.reset();
+      _elapsed = "0.00";
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
   int rounds = 0; // Numero de Jogadas
   int level = 4; // Nível do Puzzle
 
   void incrementRounds() {
     setState(() {
+      if (!_stopwatch.isRunning) _startTimer();
       rounds++;
     });
   }
 
   void shuffle() {
     setState(() {
+      _resetTimer();
       rounds = 0;
     });
   }
@@ -53,7 +82,7 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.primary,
         title: Text(
-          widget.title, 
+          'Flutter Puzzle Mobile', 
           style: 
             TextStyle(
               color: Theme.of(context).colorScheme.onPrimary),),
@@ -64,7 +93,8 @@ class _MyHomePageState extends State<MyHomePage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('Número de jogadas: $rounds'),
+            Text('Timer: ${_elapsed.toString()}s'),
+            Text('$rounds jogadas'),
             Expanded(child: 
               GridView.count(
                 crossAxisCount: level,
