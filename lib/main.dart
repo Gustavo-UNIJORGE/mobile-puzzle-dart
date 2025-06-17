@@ -32,21 +32,30 @@ class _PuzzlePageState extends State<PuzzlePage> {
   int rounds = 0; // Numero de Jogadas
   int level = 4; // Nível do Puzzle
 
-  void _startTimer() {
-    if(_timer != null) return;
-    
-    _stopwatch.start();
-    _timer = Timer.periodic(Duration(milliseconds: 16), (_) {
+  Timer _createTimer() {
+    return Timer.periodic(Duration(milliseconds: 16), (_) {
       setState(() {
         _elapsed = (_stopwatch.elapsed.inMilliseconds/1000).toStringAsFixed(3);
       });
     });
   }
 
+  void _startTimer() {
+    if(_timer != null) return;
+    
+    _stopwatch.start();
+    _timer = _createTimer();
+  }
+
   void _stopTimer() {
     _timer?.cancel();
     _timer = null;
     _stopwatch.stop();
+  }
+
+  void _resumeTimer() {
+    _timer = _createTimer();
+    _stopwatch.start();
   }
 
   void _resetTimer() {
@@ -79,6 +88,7 @@ class _PuzzlePageState extends State<PuzzlePage> {
   @override
   Widget build(BuildContext context) {
     int length = (level * level);
+    bool isRunning = _stopwatch.isRunning;
 
     return Scaffold(
       appBar: AppBar(
@@ -94,14 +104,33 @@ class _PuzzlePageState extends State<PuzzlePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(onPressed: _resetTimer, child: Text('Reset')),
-                Expanded(child: 
-                  Text('Timer: ${_elapsed.toString()}s')),
-              ],
+            Padding(
+              padding: EdgeInsetsGeometry.symmetric(
+                horizontal: 64, 
+                vertical: 16
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  
+                  ElevatedButton(onPressed: _resetTimer, child: Text('Reset')),
+                  Expanded(child: 
+                    Text('Timer: ${_elapsed.toString()}s', 
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    )
+                  ),
+                  ElevatedButton(
+                    onPressed: isRunning ? _stopTimer : _resumeTimer,
+                    child: Text(isRunning ? 'Stop' : 'Resume'), 
+                  )
+                ],
+              ),
             ),
+            
             Text('$rounds jogadas'),
             Expanded(child: 
               GridView.count(
