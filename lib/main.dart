@@ -27,11 +27,16 @@ class PuzzlePage extends StatefulWidget {
 class _PuzzlePageState extends State<PuzzlePage> {
   final Stopwatch _stopwatch = Stopwatch();
   Timer? _timer;
-  String _elapsed = "0:00";
+  String _elapsed = "0:000";
+
+  int rounds = 0; // Numero de Jogadas
+  int level = 4; // Nível do Puzzle
 
   void _startTimer() {
+    if(_timer != null) return;
+    
     _stopwatch.start();
-    _timer = Timer.periodic(Duration(milliseconds: 100), (_) {
+    _timer = Timer.periodic(Duration(milliseconds: 16), (_) {
       setState(() {
         _elapsed = (_stopwatch.elapsed.inMilliseconds/1000).toStringAsFixed(3);
       });
@@ -40,6 +45,7 @@ class _PuzzlePageState extends State<PuzzlePage> {
 
   void _stopTimer() {
     _timer?.cancel();
+    _timer = null;
     _stopwatch.stop();
   }
 
@@ -47,22 +53,12 @@ class _PuzzlePageState extends State<PuzzlePage> {
     _stopTimer();
     setState(() {
       _stopwatch.reset();
-      _elapsed = "0.00";
+      _elapsed = "0.000";
     });
   }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
-  }
-
-  int rounds = 0; // Numero de Jogadas
-  int level = 4; // Nível do Puzzle
-
   void incrementRounds() {
+    if (_timer == null) _startTimer();
     setState(() {
-      if (!_stopwatch.isRunning) _startTimer();
       rounds++;
     });
   }
@@ -75,6 +71,12 @@ class _PuzzlePageState extends State<PuzzlePage> {
   }
 
   @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     int length = (level * level);
 
@@ -83,17 +85,23 @@ class _PuzzlePageState extends State<PuzzlePage> {
         backgroundColor: Theme.of(context).colorScheme.primary,
         title: Text(
           'Flutter Puzzle Mobile', 
-          style: 
-            TextStyle(
-              color: Theme.of(context).colorScheme.onPrimary),),
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onPrimary
+          ),
+        ),
       ),
       body: Center(
         child: Column(
-          verticalDirection: VerticalDirection.down,
-          crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('Timer: ${_elapsed.toString()}s'),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(onPressed: _resetTimer, child: Text('Reset')),
+                Expanded(child: 
+                  Text('Timer: ${_elapsed.toString()}s')),
+              ],
+            ),
             Text('$rounds jogadas'),
             Expanded(child: 
               GridView.count(
