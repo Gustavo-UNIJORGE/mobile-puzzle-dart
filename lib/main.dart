@@ -39,6 +39,12 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  void shuffle() {
+    setState(() {
+      rounds = 0;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     int length = (level * level);
@@ -60,8 +66,8 @@ class _MyHomePageState extends State<MyHomePage> {
           children: [
             Text('Número de jogadas: $rounds'),
             Expanded(child: 
-              GridView(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: level),
+              GridView.count(
+                crossAxisCount: level,
                 padding: EdgeInsets.all(64),
                 children: List.generate(length, (index) {
                   var value = index + 1;
@@ -82,7 +88,7 @@ class _MyHomePageState extends State<MyHomePage> {
         )
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () => shuffle(),
         tooltip: 'Increment',
         child: const Icon(Icons.shuffle),
       ), // This trailing comma makes auto-formatting nicer for build methods.
