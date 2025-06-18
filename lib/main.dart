@@ -66,7 +66,7 @@ class _PuzzlePageState extends State<PuzzlePage> {
     });
   }
   void incrementRounds() {
-    if (_timer == null) _startTimer();
+    _startTimer();
     setState(() {
       rounds++;
     });
