@@ -45,7 +45,7 @@ class _PuzzleState extends State<Puzzle> {
   }
 
   
-  void _selectLevel(BuildContext context) async {
+  void _changeLevel(BuildContext context) async {
     _timerController?.stop();
     // O usuário define o nível nas opções do dialog
     final int? selected = await _showLevelDialog(context);
@@ -112,8 +112,18 @@ class _PuzzleState extends State<Puzzle> {
                   SizedBox(
                     width: 128,
                     child: ElevatedButton(
-                      onPressed: _timerController!.isRunning  ? _timerController?.stop : _timerController?.resume,
-                      child: Text(_timerController!.isRunning ? 'Parar' : 'Continuar'), 
+                      onPressed: 
+                        _timerController!.elapsed.inMilliseconds > 0 
+                          ? (_timerController!.isRunning  
+                            ? _timerController?.stop 
+                            : _timerController?.resume
+                          ) : null,
+                      child: Text(
+                        _timerController!.elapsed.inMilliseconds > 0 
+                          ? (_timerController!.isRunning 
+                            ? 'Parar' 
+                            : 'Retornar'
+                          ) : 'Iniciar'), 
                     ) 
                   ),
                   
@@ -126,7 +136,7 @@ class _PuzzleState extends State<Puzzle> {
                   SizedBox(
                     width: 128,
                     child: TextButton(
-                      onPressed: () async => _selectLevel(context),  
+                      onPressed: () async => _changeLevel(context),  
                       child: Text('Nível: $level')
                     ) 
                   ),
