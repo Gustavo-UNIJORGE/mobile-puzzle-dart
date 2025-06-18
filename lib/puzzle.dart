@@ -17,18 +17,7 @@ class _PuzzleState extends State<Puzzle> {
   /* Level Settings */
   int level = 2; // Nível do Puzzle
   List<int> list = [];
-  /* Player Settings */
   int rounds = 0; // Numero de Jogadas
-
-
-  Timer _createTimer() {
-    return Timer.periodic(Duration(milliseconds: 16), (_) {
-      setState(() {
-        // _elapsed = (_stopwatch.elapsed.inMilliseconds/1000).toStringAsFixed(3);
-        _elapsed = _stopwatch.elapsed;
-      });
-    });
-  }
 
   void _startTimer() {
     if(_timer != null) return;
@@ -67,25 +56,34 @@ class _PuzzleState extends State<Puzzle> {
     });
   }
 
-
-
   void _selectLevel(BuildContext context) async {
     setState(() {
       _stopTimer();
     });
+    // O usuário define o nível nas opções do dialog
     final int? selected = await _showLevelDialog(context);
     if (selected != null && selected != level) {
-      setState(() {
+      setState(() { // Atualiza level e reinicia o timer
         level = selected;
         _resetTimer();
       });
     }
   }
 
-  void _initPuzzle() {
-    final length = level * level; 
-    setState(() {
+  void _generatePuzzle() {
+    // O puzzle é gerado a partir do nível selecionado
+    final length = level * level; // Uma vez que seu tamanho é level^2
+    setState(() { // Gera a lista de 1 a level^2 e embaralha os valores
       list = List.generate(length - 1, (i) => i + 1)..shuffle(); 
+    });
+  }
+
+  
+  Timer _createTimer() {
+    return Timer.periodic(Duration(milliseconds: 16), (_) {
+      setState(() {
+        _elapsed = _stopwatch.elapsed;
+      });
     });
   }
 
@@ -112,7 +110,7 @@ class _PuzzleState extends State<Puzzle> {
   @override
   void initState() {
     super.initState();
-    _initPuzzle();    
+    _generatePuzzle();    
   }
 
   @override
