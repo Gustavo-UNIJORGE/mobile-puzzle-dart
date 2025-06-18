@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'timer.dart';
 
 class Puzzle extends StatefulWidget {
   const Puzzle({super.key});
@@ -9,102 +11,15 @@ class Puzzle extends StatefulWidget {
 }
 
 class _PuzzleState extends State<Puzzle> {
-  /* Game Settings*/
-  final Stopwatch _stopwatch = Stopwatch();
-  Timer? _timer;
-  Duration _elapsed = Duration();
-
-  /* Level Settings */
   int level = 2; // Nível do Puzzle
   List<int> list = [];
   int rounds = 0; // Numero de Jogadas
+  TimerController? _timerController;
 
-  void _startTimer() {
-    if(_timer != null) return;
-
-    _stopwatch.start();
-    _timer = _createTimer();
-  }
-
-  void _stopTimer() {
-    _stopwatch.stop();
-    _timer?.cancel();
-    setState(() {
-      _timer = null;
-    });
-  }
-
-  void _resumeTimer() {
-    _timer = _createTimer();
-    setState(() {
-      _stopwatch.start();
-    });
-  }
-
-  void _resetTimer() {
-    _stopTimer();
-    setState(() {
-      _stopwatch.reset();
-      _elapsed = Duration();
-      rounds = 0;
-    });
-  }
-  void incrementRounds() {
-    _startTimer();
-    setState(() {
-      rounds++;
-    });
-  }
-
-  void _selectLevel(BuildContext context) async {
-    setState(() {
-      _stopTimer();
-    });
-    // O usuário define o nível nas opções do dialog
-    final int? selected = await _showLevelDialog(context);
-    if (selected != null && selected != level) {
-      setState(() { // Atualiza level e reinicia o timer
-        level = selected;
-        _resetTimer();
-      });
-    }
-  }
-
-  void _generatePuzzle() {
-    // O puzzle é gerado a partir do nível selecionado
-    final length = level * level; // Uma vez que seu tamanho é level^2
-    setState(() { // Gera a lista de 1 a level^2 e embaralha os valores
-      list = List.generate(length - 1, (i) => i + 1)..shuffle(); 
-    });
-  }
-
-  
-  Timer _createTimer() {
-    return Timer.periodic(Duration(milliseconds: 16), (_) {
-      setState(() {
-        _elapsed = _stopwatch.elapsed;
-      });
-    });
-  }
-
-  void _restartPuzzle(BuildContext context) async {
-    setState(() {
-      _stopTimer();
-    });
-    final bool selected = await _showShuffleDialog(context);
-    if(selected) {
-      setState(() {
-        _shuffleList();
-      });
-    }
-  }
-
-  void _shuffleList() {
-    setState(() {
-      _resetTimer();
-      list.shuffle();
-      rounds = 0;
-    });
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _timerController = Provider.of<TimerController>(context);
   }
 
   @override
@@ -113,15 +28,51 @@ class _PuzzleState extends State<Puzzle> {
     _generatePuzzle();    
   }
 
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
+  void _generatePuzzle() {
+    // O puzzle é gerado a partir do nível selecionado
+    setState(() { // Gera a lista de 1 a level^2 e embaralha os valores
+      list = List.generate(((level * level) - 1), (i) => i + 1)..shuffle(); 
+    });
+  }
+
+  void shuffleList() {
+    setState(() {
+      _generatePuzzle();
+      list.shuffle();
+      rounds = 0;
+    });
+    _timerController?.reset();
+  }
+
+  
+  void _selectLevel(BuildContext context) async {
+    _timerController?.stop();
+    // O usuário define o nível nas opções do dialog
+    final int? selected = await _showLevelDialog(context);
+    if (selected != null && selected != level) {
+      setState(() { // Atualiza level e reinicia o timer
+        level = selected;
+        shuffleList();
+      });
+      return _timerController?.reset();
+    }
+    return _timerController?.resume();
+  }
+
+  void _restartPuzzle(BuildContext context) async {
+      // _stopTimer();
+    _timerController?.stop();
+    final bool selected = await _showShuffleDialog(context);
+    if(selected) {
+      setState(() {
+        shuffleList();
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    bool isRunning = _stopwatch.isRunning;
+    // bool isRunning = _timerController.isRunning;
 
     return Scaffold(
       appBar: AppBar(
@@ -147,10 +98,10 @@ class _PuzzleState extends State<Puzzle> {
                 children: [  
                   SizedBox(
                     width: 128,
-                    child: ElevatedButton(onPressed: _resetTimer, child: Text('Reset')) 
+                    child: ElevatedButton(onPressed: _timerController?.reset, child: Text('Reset')) 
                   ),
                   Expanded(child: 
-                    Text('$_elapsed', 
+                    Text('${_timerController?.elapsed}', 
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 24,
@@ -161,8 +112,8 @@ class _PuzzleState extends State<Puzzle> {
                   SizedBox(
                     width: 128,
                     child: ElevatedButton(
-                      onPressed: isRunning ? _stopTimer : _resumeTimer,
-                      child: Text(isRunning ? 'Parar' : 'Continuar'), 
+                      onPressed: _timerController!.isRunning  ? _timerController?.stop : _timerController?.resume,
+                      child: Text(_timerController!.isRunning ? 'Parar' : 'Continuar'), 
                     ) 
                   ),
                   
@@ -196,7 +147,10 @@ class _PuzzleState extends State<Puzzle> {
                       child:Text('$value')
                     ),
                     ElevatedButton(
-                      onPressed: () => incrementRounds(),
+                      onPressed: () {
+                        setState(() =>rounds++);
+                        _timerController?.start();
+                      },
                       style: ElevatedButton.styleFrom(
                         shape: LinearBorder(),
                       ),
