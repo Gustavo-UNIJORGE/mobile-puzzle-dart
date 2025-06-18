@@ -82,6 +82,13 @@ class _PuzzleState extends State<Puzzle> {
     }
   }
 
+  void _initPuzzle() {
+    final length = level * level; 
+    setState(() {
+      list = List.generate(length - 1, (i) => i + 1)..shuffle(); 
+    });
+  }
+
   void _restartPuzzle(BuildContext context) async {
     setState(() {
       _stopTimer();
@@ -89,17 +96,23 @@ class _PuzzleState extends State<Puzzle> {
     final bool selected = await _showShuffleDialog(context);
     if(selected) {
       setState(() {
-        _shuffle();
+        _shuffleList();
       });
     }
   }
 
-  void _shuffle() {
+  void _shuffleList() {
     setState(() {
       _resetTimer();
       list.shuffle();
       rounds = 0;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _initPuzzle();    
   }
 
   @override
@@ -110,9 +123,6 @@ class _PuzzleState extends State<Puzzle> {
 
   @override
   Widget build(BuildContext context) {
-    int length = (level * level);
-    list = List.generate(length - 1, (int i) => i + 1);
-    list.shuffle();
     bool isRunning = _stopwatch.isRunning;
 
     return Scaffold(
@@ -181,7 +191,7 @@ class _PuzzleState extends State<Puzzle> {
 
                   children: [for (var value in list) 
                     ElevatedButton(
-                      onPressed: value >= length ? () => incrementRounds() : null,
+                      onPressed: null,
                       style: ElevatedButton.styleFrom(
                         shape: LinearBorder(),
                       ),
