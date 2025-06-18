@@ -67,13 +67,7 @@ class _PuzzleState extends State<Puzzle> {
     });
   }
 
-  void shuffle() {
-    setState(() {
-      _resetTimer();
-      list.shuffle();
-      rounds = 0;
-    });
-  }
+
 
   void _selectLevel(BuildContext context) async {
     setState(() {
@@ -86,6 +80,26 @@ class _PuzzleState extends State<Puzzle> {
         _resetTimer();
       });
     }
+  }
+
+  void _restartPuzzle(BuildContext context) async {
+    setState(() {
+      _stopTimer();
+    });
+    final bool selected = await _showShuffleDialog(context);
+    if(selected) {
+      setState(() {
+        _shuffle();
+      });
+    }
+  }
+
+  void _shuffle() {
+    setState(() {
+      _resetTimer();
+      list.shuffle();
+      rounds = 0;
+    });
   }
 
   @override
@@ -188,9 +202,9 @@ class _PuzzleState extends State<Puzzle> {
         )
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => shuffle(),
-        tooltip: 'Increment',
-        child: const Icon(Icons.shuffle),
+        onPressed: () => _restartPuzzle(context),
+        tooltip: 'Reiniciar',
+        child: const Icon(Icons.restart_alt),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
@@ -223,6 +237,30 @@ Future<int?> _showLevelDialog(BuildContext context) async {
             child: Text('Difícil (4x4)')
           ),
         ]
+      );
+    }
+  );
+}
+
+Future<bool> _showShuffleDialog(BuildContext context) async {
+  return await showDialog(
+    context: context, 
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('Tem certeza que quer Embaralhar?', style: TextStyle(
+          fontWeight: FontWeight.bold,
+        )),
+        content: const Text('Seu progresso e tempo será perdido.'),
+        actions: [
+          TextButton (
+            onPressed: () => Navigator.pop(context, true),
+            child: Text('Confimar')
+          ),
+          TextButton (
+            onPressed: () => Navigator.pop(context, false),
+            child: Text('Cancelar')
+          )
+        ] 
       );
     }
   );
