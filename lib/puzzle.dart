@@ -16,7 +16,7 @@ class _PuzzleState extends State<Puzzle> {
 
   /* Level Settings */
   int level = 2; // Nível do Puzzle
-
+  List<int> list = [];
   /* Player Settings */
   int rounds = 0; // Numero de Jogadas
 
@@ -32,7 +32,7 @@ class _PuzzleState extends State<Puzzle> {
 
   void _startTimer() {
     if(_timer != null) return;
-    
+
     _stopwatch.start();
     _timer = _createTimer();
   }
@@ -70,6 +70,7 @@ class _PuzzleState extends State<Puzzle> {
   void shuffle() {
     setState(() {
       _resetTimer();
+      list.shuffle();
       rounds = 0;
     });
   }
@@ -96,7 +97,8 @@ class _PuzzleState extends State<Puzzle> {
   @override
   Widget build(BuildContext context) {
     int length = (level * level);
-
+    list = List.generate(length - 1, (int i) => i + 1);
+    list.shuffle();
     bool isRunning = _stopwatch.isRunning;
 
     return Scaffold(
@@ -162,19 +164,23 @@ class _PuzzleState extends State<Puzzle> {
                 GridView.count(
                   crossAxisCount: level,
                   padding: EdgeInsets.all(64),
-                  children: List.generate(length, (index) {
-                    var value = index + 1;
-                
-                    return ElevatedButton(
+
+                  children: [for (var value in list) 
+                    ElevatedButton(
                       onPressed: value >= length ? () => incrementRounds() : null,
                       style: ElevatedButton.styleFrom(
                         shape: LinearBorder(),
                       ),
-                      child: 
-                        Text(value < length ? "$value" : ""), 
-                    );
-                  })
-                  ,
+                      child:Text('$value')
+                    ),
+                    ElevatedButton(
+                      onPressed: () => incrementRounds(),
+                      style: ElevatedButton.styleFrom(
+                        shape: LinearBorder(),
+                      ),
+                      child:Text('')
+                    )
+                  ]
                 ),
               )
             ]
