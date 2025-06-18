@@ -9,12 +9,18 @@ class PuzzlePage extends StatefulWidget {
 }
 
 class _PuzzlePageState extends State<PuzzlePage> {
+  /* Game Settings*/
   final Stopwatch _stopwatch = Stopwatch();
   Timer? _timer;
   String _elapsed = "0:000";
 
-  int rounds = 0; // Numero de Jogadas
+  /* Level Settings */
   int level = 4; // Nível do Puzzle
+  // int puzzleLength;
+
+  /* Player Settings */
+  int rounds = 0; // Numero de Jogadas
+
 
   Timer _createTimer() {
     return Timer.periodic(Duration(milliseconds: 16), (_) {
@@ -51,6 +57,7 @@ class _PuzzlePageState extends State<PuzzlePage> {
     setState(() {
       _stopwatch.reset();
       _elapsed = "0.000";
+      rounds = 0;
     });
   }
   void incrementRounds() {
@@ -89,18 +96,17 @@ class _PuzzlePageState extends State<PuzzlePage> {
         ),
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Padding(
-              padding: EdgeInsetsGeometry.symmetric(
-                horizontal: 64, 
-                vertical: 16
-              ),
-              child: Row(
+        child: Padding(
+          padding: EdgeInsetsGeometry.symmetric(
+            horizontal: 64, 
+            vertical: 16
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [ 
+              Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  
+                children: [  
                   ElevatedButton(onPressed: _resetTimer, child: Text('Reset')),
                   Expanded(child: 
                     Text('Timer: ${_elapsed.toString()}s', 
@@ -117,29 +123,39 @@ class _PuzzlePageState extends State<PuzzlePage> {
                   )
                 ],
               ),
-            ),
-            
-            Text('$rounds jogadas'),
-            Expanded(child: 
-              GridView.count(
-                crossAxisCount: level,
-                padding: EdgeInsets.all(64),
-                children: List.generate(length, (index) {
-                  var value = index + 1;
-              
-                  return ElevatedButton(
-                    onPressed: value >= length ? () => incrementRounds() : null,
-                    style: ElevatedButton.styleFrom(
-                      shape: LinearBorder(),
-                    ),
-                    child: 
-                      Text(value < length ? "$value" : ""), 
-                  );
-                })
-                ,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Expanded(child: Text('$rounds jogadas')),
+                  TextButton(
+                    onPressed: () {
+                      print('open dialog');
+                    },  
+                    child: Text('Nível: $level')
+                  ),
+                ],
               ),
-            )
-          ],
+              Expanded(child: 
+                GridView.count(
+                  crossAxisCount: level,
+                  padding: EdgeInsets.all(64),
+                  children: List.generate(length, (index) {
+                    var value = index + 1;
+                
+                    return ElevatedButton(
+                      onPressed: value >= length ? () => incrementRounds() : null,
+                      style: ElevatedButton.styleFrom(
+                        shape: LinearBorder(),
+                      ),
+                      child: 
+                        Text(value < length ? "$value" : ""), 
+                    );
+                  })
+                  ,
+                ),
+              )
+            ]
+          ),
         )
       ),
       floatingActionButton: FloatingActionButton(
