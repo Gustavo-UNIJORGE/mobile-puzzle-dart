@@ -139,15 +139,17 @@ class _PuzzleState extends State<Puzzle> {
         )
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _restartPuzzle(context),
+        onPressed: () { 
+          (_timerController!.isRunning) 
+            ? _restartPuzzle(context)
+            : shuffleList();
+        },
         tooltip: 'Reiniciar',
         child: const Icon(Icons.restart_alt),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      ),
     );
   }
 }
-
-
 
 Future<int?> _showLevelDialog(BuildContext context) async {
   return await showDialog<int>(
@@ -191,7 +193,7 @@ Future<bool> _showShuffleDialog(BuildContext context) async {
         actions: [
           TextButton (
             onPressed: () => Navigator.pop(context, true),
-            child: Text('Confimar')
+            child: Text('Confirmar')
           ),
           TextButton (
             onPressed: () => Navigator.pop(context, false),
