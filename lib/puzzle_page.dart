@@ -190,24 +190,29 @@ class _PuzzlePageState extends State<PuzzlePage> {
 Future<int?> _showLevelDialog(BuildContext context) async {
   return await showDialog<int>(
     context: context,
-    builder: (BuildContext context) => AlertDialog(
-      // actionsAlignment: MainAxisAlignment.center,
-      title: const Text('Nível de Dificuldade'),
-      content: const Text('Escolha o nível de dificuldade:'),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context, 2),
-          child: Text('Fácil (2x2)')
+    builder: (BuildContext context) {
+      return AlertDialog(
+        // actionsAlignment: MainAxisAlignment.center,
+        title: const Text('Nível de Dificuldade', style: TextStyle(
+          fontWeight: FontWeight.bold,
+          ),
         ),
-        TextButton(
-          onPressed: () => Navigator.pop(context, 3), 
-          child: Text('Médio (3x3)')
-        ),
-        TextButton(
-          onPressed: () => Navigator.pop(context, 4),
-          child: Text('Difícil (4x4)')
-        ),
-      ]
-    )
+        content: const Text('Escolha o nível de dificuldade:'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, 2),
+            child: Text('Fácil (2x2)')
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, 3), 
+            child: Text('Médio (3x3)')
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, 4),
+            child: Text('Difícil (4x4)')
+          ),
+        ]
+      );
+    }
   );
 }
