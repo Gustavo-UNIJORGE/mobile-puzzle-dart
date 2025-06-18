@@ -1,3 +1,4 @@
+import 'app.dart';
 import 'timer.dart';
 import 'puzzle.dart';
 import 'package:flutter/material.dart';
@@ -7,8 +8,8 @@ void main() {
   runApp(
     ChangeNotifierProvider(
       create: (_) => TimerController(),
-      child: const MaterialApp(
-        home: Puzzle()
+      child: MaterialApp(
+        home: App()
       )  
     )
   );

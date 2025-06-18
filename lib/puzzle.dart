@@ -4,148 +4,113 @@ import 'package:provider/provider.dart';
 import 'package:puzzle_mobile/timer_controls.dart';
 import 'package:puzzle_mobile/timer.dart';
 
-class Puzzle extends StatefulWidget {
-  const Puzzle({super.key});
 
-  @override
-  State<Puzzle> createState() => _PuzzleState();
-}
 
-class _PuzzleState extends State<Puzzle> {
+class PuzzleController extends ChangeNotifier {
   int level = 2; // Nível do Puzzle
-  List<int> list = [];
+  List<int> list = List.generate((4 - 1), (i) => i + 1)..shuffle();
   int rounds = 0; // Numero de Jogadas
   TimerController? _timerController;
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _timerController = Provider.of<TimerController>(context);
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _generatePuzzle();    
-  }
-
-  void _generatePuzzle() {
+  void generatePuzzle() {
     // O puzzle é gerado a partir do nível selecionado
-    setState(() { // Gera a lista de 1 a level^2 e embaralha os valores
-      list = List.generate(((level * level) - 1), (i) => i + 1)..shuffle(); 
-    });
+    // Gera a lista de 1 a level^2 e embaralha os valores
+    list = List.generate(((level * level) - 1), (i) => i + 1)..shuffle(); 
+    notifyListeners();
   }
 
   void shuffleList() {
-    setState(() {
-      _generatePuzzle();
+    if (list.length > 1) {
       list.shuffle();
-      rounds = 0;
-    });
+    } else {
+      generatePuzzle();
+    }
+    rounds = 0;
     _timerController?.reset();
+    notifyListeners();
+
   }
 
-  
-  void _changeLevel(BuildContext context) async {
+  void changeLevel(BuildContext context) async {
     _timerController?.stop();
     // O usuário define o nível nas opções do dialog
     final int? selected = await _showLevelDialog(context);
     if (selected != null && selected != level) {
-      setState(() { // Atualiza level e reinicia o timer
-        level = selected;
-        shuffleList();
-      });
+      level = selected;
+      generatePuzzle();
+      shuffleList();
+      notifyListeners();
       return _timerController?.reset();
     }
+    notifyListeners();
     return _timerController?.resume();
   }
 
-  void _restartPuzzle(BuildContext context) async {
-      // _stopTimer();
+  void restartPuzzle(BuildContext context) async {
     _timerController?.stop();
     final bool selected = await _showShuffleDialog(context);
     if(selected) {
-      setState(() {
-        shuffleList();
-      });
+      shuffleList();
     }
+    notifyListeners();
   }
+}
+
+class Puzzle extends StatelessWidget {
+  const Puzzle({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // bool isRunning = _timerController.isRunning;
+    final timer = context.watch<TimerController>();
+    final puzzle = context.watch<PuzzleController>();
 
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        title: Text(
-          'Flutter Puzzle Mobile', 
-          style: TextStyle(
-            color: Theme.of(context).colorScheme.onPrimary
-          ),
-        ),
-      ),
-      body: Center(
-        child: Padding(
-          padding: EdgeInsetsGeometry.symmetric(
-            horizontal: 64, 
-            vertical: 16
-          ),
-          child: Column(
+
+    return Padding(
+      padding: EdgeInsetsGeometry.symmetric(horizontal: 64, vertical: 16),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          TimerControls(timerController: timer),
+          Row( /* Game Settings */
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              TimerControls(timerController: _timerController!),
-              Row( /* Game Settings */
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Expanded(child: Text('$rounds jogadas', textAlign: TextAlign.end,)),
-                  SizedBox(
-                    width: 128,
-                    child: TextButton(
-                      onPressed: () async => _changeLevel(context),  
-                      child: Text('Nível: $level')
-                    ) 
-                  ),
-                ]
+              Expanded(child: Text('${puzzle.rounds} jogadas', textAlign: TextAlign.end,)),
+              SizedBox(
+                width: 128,
+                child: TextButton(
+                  onPressed: () async => puzzle.changeLevel(context),  
+                  child: Text('Nível: ${puzzle.level}')
+                ) 
               ),
-              Expanded(child: 
-                GridView.count(
-                  crossAxisCount: level,
-                  padding: EdgeInsets.all(64),
-            
-                  children: [for (var value in list) 
-                    ElevatedButton(
-                      onPressed: null,
-                      style: ElevatedButton.styleFrom(
-                        shape: LinearBorder(),
-                      ),
-                      child:Text('$value')
-                    ),
-                    ElevatedButton(
-                      onPressed: () {
-                        setState(() =>rounds++);
-                        _timerController?.start();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        shape: LinearBorder(),
-                      ),
-                      child:Text('')
-                    )
-                    ]
-                ),
-              )
-            ],
+            ]
           ),
-        )
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () { 
-          (rounds > 0) 
-            ? _restartPuzzle(context)
-            : shuffleList();
-        },
-        tooltip: 'Reiniciar',
-        child: const Icon(Icons.restart_alt),
+          Expanded(child: 
+            GridView.count(
+              crossAxisCount: puzzle.level,
+              padding: EdgeInsets.all(64),
+        
+              children: [for (var value in puzzle.list) 
+                ElevatedButton(
+                  onPressed: null,
+                  style: ElevatedButton.styleFrom(
+                    shape: LinearBorder(),
+                  ),
+                  child:Text('$value')
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    puzzle.rounds++;
+                    timer.start();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    shape: LinearBorder(),
+                  ),
+                  child:Text('')
+                )
+              ]
+            ),
+          )
+        ],
       ),
     );
   }
