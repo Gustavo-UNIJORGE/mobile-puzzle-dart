@@ -12,11 +12,11 @@ class _PuzzlePageState extends State<PuzzlePage> {
   /* Game Settings*/
   final Stopwatch _stopwatch = Stopwatch();
   Timer? _timer;
-  String _elapsed = "0:000";
+  Duration _elapsed = Duration();
 
   /* Level Settings */
   int level = 2; // Nível do Puzzle
-  // int puzzleLength;
+   
 
   /* Player Settings */
   int rounds = 0; // Numero de Jogadas
@@ -25,7 +25,8 @@ class _PuzzlePageState extends State<PuzzlePage> {
   Timer _createTimer() {
     return Timer.periodic(Duration(milliseconds: 16), (_) {
       setState(() {
-        _elapsed = (_stopwatch.elapsed.inMilliseconds/1000).toStringAsFixed(3);
+        // _elapsed = (_stopwatch.elapsed.inMilliseconds/1000).toStringAsFixed(3);
+        _elapsed = _stopwatch.elapsed;
       });
     });
   }
@@ -56,7 +57,7 @@ class _PuzzlePageState extends State<PuzzlePage> {
     _stopTimer();
     setState(() {
       _stopwatch.reset();
-      _elapsed = "0.000";
+      _elapsed = Duration();
       rounds = 0;
     });
   }
@@ -107,9 +108,12 @@ class _PuzzlePageState extends State<PuzzlePage> {
               Row( /* Stopwatch */
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [  
-                  ElevatedButton(onPressed: _resetTimer, child: Text('Reset')),
+                  SizedBox(
+                    width: 128,
+                    child: ElevatedButton(onPressed: _resetTimer, child: Text('Reset')) 
+                  ),
                   Expanded(child: 
-                    Text('Timer: ${_elapsed.toString()}s', 
+                    Text('$_elapsed', 
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 24,
@@ -117,29 +121,37 @@ class _PuzzlePageState extends State<PuzzlePage> {
                       ),
                     )
                   ),
-                  ElevatedButton(
-                    onPressed: isRunning ? _stopTimer : _resumeTimer,
-                    child: Text(isRunning ? 'Stop' : 'Resume'), 
-                  )
+                  SizedBox(
+                    width: 128,
+                    child: ElevatedButton(
+                      onPressed: isRunning ? _stopTimer : _resumeTimer,
+                      child: Text(isRunning ? 'Parar' : 'Continuar'), 
+                    ) 
+                  ),
+                  
                 ],
               ),
               Row( /* Game Settings */
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Expanded(child: Text('$rounds jogadas')),
-                  TextButton(
-                    onPressed: () async {
-                      final int? selected = await _showLevelDialog(context);
-                      if (selected != null && selected != level) {
-                        setState(() {
-                          level = selected;
-                          _resetTimer();
-                        });
-                      }
+                  Expanded(child: Text('$rounds jogadas', textAlign: TextAlign.end,)),
+                  SizedBox(
+                    width: 128,
+                    child: TextButton(
+                      onPressed: () async {
+                        final int? selected = await _showLevelDialog(context);
+                        if (selected != null && selected != level) {
+                          setState(() {
+                            level = selected;
+                            _resetTimer();
+                          });
+                        }
 
-                    },  
-                    child: Text('Nível: $level')
+                      },  
+                      child: Text('Nível: $level')
+                    ) 
                   ),
+                  
                 ],
               ),
               Expanded(child: 
