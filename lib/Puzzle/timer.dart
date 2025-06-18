@@ -14,11 +14,14 @@ class TimerSettings extends StatelessWidget {
     return Row( /* Stopwatch */
       mainAxisAlignment: MainAxisAlignment.center,
       children: [  
-        SizedBox(
+        SizedBox( /* Reset Button */
           width: 128,
-          child: ElevatedButton(onPressed: timerController.reset, child: Text('Reset')) 
+          child: ElevatedButton(
+            onPressed: timerController.reset, 
+            child: Text('Reset')
+          ) 
         ),
-        Expanded(child: 
+        Expanded(child: /* Timer */
           Text('${timerController.elapsed}', 
             textAlign: TextAlign.center,
             style: TextStyle(
@@ -27,7 +30,7 @@ class TimerSettings extends StatelessWidget {
             ),
           )
         ),
-        SizedBox(
+        SizedBox( /* Start/Stop Button */
           width: 128,
           child: ElevatedButton(
             onPressed: 
@@ -49,7 +52,7 @@ class TimerSettings extends StatelessWidget {
     );
   }
 }
-
+// TODO: Entender porque TimeController é ChangeNotifier e nao um State
 class TimerController extends ChangeNotifier {
   final refreshRate = 100;
   final Stopwatch _stopwatch = Stopwatch();
@@ -61,7 +64,8 @@ class TimerController extends ChangeNotifier {
     if(_timer != null) return;
 
     _stopwatch.start();
-    _timer = Timer.periodic(Duration(milliseconds: refreshRate), (_) {
+    _timer = Timer.periodic(
+        Duration(milliseconds: refreshRate), (_) {
       notifyListeners();
     });
     
@@ -78,7 +82,8 @@ class TimerController extends ChangeNotifier {
 
   void resume() {
     if (_timer == null) {
-      _timer = Timer.periodic(Duration(milliseconds: refreshRate), (_) {
+      _timer = Timer.periodic(
+          Duration(milliseconds: refreshRate), (_) {
         notifyListeners();
       });
       _stopwatch.start();
@@ -89,6 +94,7 @@ class TimerController extends ChangeNotifier {
   }
 
   void reset() {
+    _stopwatch.stop();
     _stopwatch.reset();
     _timer?.cancel();
     _timer = null;
