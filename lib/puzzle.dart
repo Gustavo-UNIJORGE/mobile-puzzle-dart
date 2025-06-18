@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'timer.dart';
+import 'package:puzzle_mobile/timer_controls.dart';
+import 'package:puzzle_mobile/timer.dart';
 
 class Puzzle extends StatefulWidget {
   const Puzzle({super.key});
@@ -92,43 +93,8 @@ class _PuzzleState extends State<Puzzle> {
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: [ 
-              Row( /* Stopwatch */
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [  
-                  SizedBox(
-                    width: 128,
-                    child: ElevatedButton(onPressed: _timerController?.reset, child: Text('Reset')) 
-                  ),
-                  Expanded(child: 
-                    Text('${_timerController?.elapsed}', 
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    )
-                  ),
-                  SizedBox(
-                    width: 128,
-                    child: ElevatedButton(
-                      onPressed: 
-                        _timerController!.elapsed.inMilliseconds > 0 
-                          ? (_timerController!.isRunning  
-                            ? _timerController?.stop 
-                            : _timerController?.resume
-                          ) : null,
-                      child: Text(
-                        _timerController!.elapsed.inMilliseconds > 0 
-                          ? (_timerController!.isRunning 
-                            ? 'Parar' 
-                            : 'Retornar'
-                          ) : 'Iniciar'), 
-                    ) 
-                  ),
-                  
-                ],
-              ),
+            children: [
+              TimerControls(timerController: _timerController!),
               Row( /* Game Settings */
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -140,14 +106,13 @@ class _PuzzleState extends State<Puzzle> {
                       child: Text('Nível: $level')
                     ) 
                   ),
-                  
-                ],
+                ]
               ),
               Expanded(child: 
                 GridView.count(
                   crossAxisCount: level,
                   padding: EdgeInsets.all(64),
-
+            
                   children: [for (var value in list) 
                     ElevatedButton(
                       onPressed: null,
@@ -166,10 +131,10 @@ class _PuzzleState extends State<Puzzle> {
                       ),
                       child:Text('')
                     )
-                  ]
+                    ]
                 ),
               )
-            ]
+            ],
           ),
         )
       ),
