@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:puzzle_mobile/puzzle.dart';
-import 'package:puzzle_mobile/timer.dart';
+import 'package:puzzle_mobile/Puzzle/puzzle.dart';
+import 'package:puzzle_mobile/Puzzle/timer.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
