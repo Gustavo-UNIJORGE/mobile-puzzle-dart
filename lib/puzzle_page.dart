@@ -16,7 +16,6 @@ class _PuzzlePageState extends State<PuzzlePage> {
 
   /* Level Settings */
   int level = 2; // Nível do Puzzle
-   
 
   /* Player Settings */
   int rounds = 0; // Numero de Jogadas
@@ -75,6 +74,19 @@ class _PuzzlePageState extends State<PuzzlePage> {
     });
   }
 
+  void _selectLevel(BuildContext context) async {
+    setState(() {
+      _stopTimer();
+    });
+    final int? selected = await _showLevelDialog(context);
+    if (selected != null && selected != level) {
+      setState(() {
+        level = selected;
+        _resetTimer();
+      });
+    }
+  }
+
   @override
   void dispose() {
     _timer?.cancel();
@@ -84,6 +96,7 @@ class _PuzzlePageState extends State<PuzzlePage> {
   @override
   Widget build(BuildContext context) {
     int length = (level * level);
+
     bool isRunning = _stopwatch.isRunning;
 
     return Scaffold(
@@ -138,16 +151,7 @@ class _PuzzlePageState extends State<PuzzlePage> {
                   SizedBox(
                     width: 128,
                     child: TextButton(
-                      onPressed: () async {
-                        final int? selected = await _showLevelDialog(context);
-                        if (selected != null && selected != level) {
-                          setState(() {
-                            level = selected;
-                            _resetTimer();
-                          });
-                        }
-
-                      },  
+                      onPressed: () async => _selectLevel(context),  
                       child: Text('Nível: $level')
                     ) 
                   ),
@@ -185,6 +189,7 @@ class _PuzzlePageState extends State<PuzzlePage> {
     );
   }
 }
+
 
 
 Future<int?> _showLevelDialog(BuildContext context) async {
