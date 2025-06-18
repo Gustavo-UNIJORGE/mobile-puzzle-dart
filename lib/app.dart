@@ -31,10 +31,8 @@ class App extends StatelessWidget {
             return FloatingActionButton(
               onPressed: () {
                 if (puzzleState.rounds > 0) {
-                  print('puzzleState existe and rounds > 0');
                   puzzleState.restartPuzzle(context);
                 } else {
-                  print('puzzleState existe and round = 0');
                   puzzleState.generatePuzzle();
                 }
               },
