@@ -52,7 +52,7 @@ class Puzzle extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          TimerSettings(timerController: timer),
+          TimerSettings(timer: timer),
           Settings(),
           Expanded(child: Canvas())
         ],

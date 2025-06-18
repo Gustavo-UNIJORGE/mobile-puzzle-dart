@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 class TimerSettings extends StatelessWidget {
-  final TimerController timerController;
+  final TimerController timer;
   const TimerSettings({
     super.key, 
-    required this.timerController
+    required this.timer
   });
 
   @override
@@ -17,12 +17,14 @@ class TimerSettings extends StatelessWidget {
         SizedBox( /* Reset Button */
           width: 128,
           child: ElevatedButton(
-            onPressed: timerController.reset, 
+            onPressed: timer.elapsed.inMilliseconds > 0 
+              ? timer.reset 
+              : null, 
             child: Text('Reset')
           ) 
         ),
         Expanded(child: /* Timer */
-          Text('${timerController.elapsed}', 
+          Text('${timer.elapsed}', 
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 24,
@@ -34,14 +36,14 @@ class TimerSettings extends StatelessWidget {
           width: 128,
           child: ElevatedButton(
             onPressed: 
-              timerController.elapsed.inMilliseconds > 0 
-                ? (timerController.isRunning  
-                  ? timerController.stop 
-                  : timerController.resume
+              timer.elapsed.inMilliseconds > 0 
+                ? (timer.isRunning  
+                  ? timer.stop 
+                  : timer.resume
                 ) : null,
             child: Text(
-              timerController.elapsed.inMilliseconds > 0 
-                ? (timerController.isRunning 
+              timer.elapsed.inMilliseconds > 0 
+                ? (timer.isRunning 
                   ? 'Parar' 
                   : 'Retornar'
                 ) : 'Iniciar'), 
