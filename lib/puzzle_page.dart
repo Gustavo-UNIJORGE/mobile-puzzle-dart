@@ -104,7 +104,7 @@ class _PuzzlePageState extends State<PuzzlePage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [ 
-              Row(
+              Row( /* Stopwatch */
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [  
                   ElevatedButton(onPressed: _resetTimer, child: Text('Reset')),
@@ -123,14 +123,39 @@ class _PuzzlePageState extends State<PuzzlePage> {
                   )
                 ],
               ),
-              Row(
+              Row( /* Game Settings */
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Expanded(child: Text('$rounds jogadas')),
                   TextButton(
-                    onPressed: () {
-                      print('open dialog');
-                    },  
+                    onPressed: () => showDialog(
+                      context: context,
+                      builder: (BuildContext context) => AlertDialog(
+                        // actionsAlignment: MainAxisAlignment.center,
+                        title: const Text('Nível de Dificuldade'),
+                        content: const Text('Escolha o nível de dificuldade:'),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context, 'Cancel');
+                            },
+                            child: Text('Fácil (2x2)')
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context, 'Cancel');
+                            }, 
+                            child: Text('Médio (3x3)')
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context, 'Cancel');
+                            }, 
+                            child: Text('Difícil (4x4)')
+                          ),
+                        ],
+                      )
+                    ),  
                     child: Text('Nível: $level')
                   ),
                 ],
