@@ -15,7 +15,7 @@ class _PuzzlePageState extends State<PuzzlePage> {
   String _elapsed = "0:000";
 
   /* Level Settings */
-  int level = 4; // Nível do Puzzle
+  int level = 2; // Nível do Puzzle
   // int puzzleLength;
 
   /* Player Settings */
@@ -128,34 +128,16 @@ class _PuzzlePageState extends State<PuzzlePage> {
                 children: [
                   Expanded(child: Text('$rounds jogadas')),
                   TextButton(
-                    onPressed: () => showDialog(
-                      context: context,
-                      builder: (BuildContext context) => AlertDialog(
-                        // actionsAlignment: MainAxisAlignment.center,
-                        title: const Text('Nível de Dificuldade'),
-                        content: const Text('Escolha o nível de dificuldade:'),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context, 'Cancel');
-                            },
-                            child: Text('Fácil (2x2)')
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context, 'Cancel');
-                            }, 
-                            child: Text('Médio (3x3)')
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context, 'Cancel');
-                            }, 
-                            child: Text('Difícil (4x4)')
-                          ),
-                        ],
-                      )
-                    ),  
+                    onPressed: () async {
+                      final int? selected = await _showLevelDialog(context);
+                      if (selected != null && selected != level) {
+                        setState(() {
+                          level = selected;
+                          _resetTimer();
+                        });
+                      }
+
+                    },  
                     child: Text('Nível: $level')
                   ),
                 ],
@@ -190,4 +172,30 @@ class _PuzzlePageState extends State<PuzzlePage> {
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
+}
+
+
+Future<int?> _showLevelDialog(BuildContext context) async {
+  return await showDialog<int>(
+    context: context,
+    builder: (BuildContext context) => AlertDialog(
+      // actionsAlignment: MainAxisAlignment.center,
+      title: const Text('Nível de Dificuldade'),
+      content: const Text('Escolha o nível de dificuldade:'),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context, 2),
+          child: Text('Fácil (2x2)')
+        ),
+        TextButton(
+          onPressed: () => Navigator.pop(context, 3), 
+          child: Text('Médio (3x3)')
+        ),
+        TextButton(
+          onPressed: () => Navigator.pop(context, 4),
+          child: Text('Difícil (4x4)')
+        ),
+      ]
+    )
+  );
 }
