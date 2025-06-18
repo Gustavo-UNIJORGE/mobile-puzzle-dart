@@ -1,14 +1,14 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 
-class PuzzlePage extends StatefulWidget {
-  const PuzzlePage({super.key});
+class Puzzle extends StatefulWidget {
+  const Puzzle({super.key});
 
   @override
-  State<PuzzlePage> createState() => _PuzzlePageState();
+  State<Puzzle> createState() => _PuzzleState();
 }
 
-class _PuzzlePageState extends State<PuzzlePage> {
+class _PuzzleState extends State<Puzzle> {
   /* Game Settings*/
   final Stopwatch _stopwatch = Stopwatch();
   Timer? _timer;
