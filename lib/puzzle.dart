@@ -140,7 +140,7 @@ class _PuzzleState extends State<Puzzle> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () { 
-          (_timerController!.isRunning) 
+          (rounds > 0) 
             ? _restartPuzzle(context)
             : shuffleList();
         },
