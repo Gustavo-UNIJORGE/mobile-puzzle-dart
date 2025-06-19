@@ -17,10 +17,11 @@ class App extends StatelessWidget {
             ),
           ),
         ),
-        body: Center(
-          child: Puzzle(), 
-        ),
-        
+        body: const SafeArea(
+          child: Center(
+            child: Puzzle(), 
+          )
+        )
       );
   }
 }

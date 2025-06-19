@@ -16,15 +16,18 @@ class Puzzle extends StatelessWidget {
         children: [
           TimerSettings(),
           Settings(),   
-          Expanded(child: Canvas())
+          AspectRatio(
+            aspectRatio: 1,
+            child: Board()
+          )
         ],
       ),
     );
   }
 }
 
-class Canvas extends StatelessWidget {
-  const Canvas({
+class Board extends StatelessWidget {
+  const Board({
     super.key,
   });
 
@@ -35,7 +38,6 @@ class Canvas extends StatelessWidget {
     return GridView.count(
       crossAxisCount: puzzle.list.level,
       padding: EdgeInsets.all(64),
-
       children: [for (var value in puzzle.list.items) 
         ElevatedButton(
           onPressed: value == 0 ? puzzle.makeMovement : null,

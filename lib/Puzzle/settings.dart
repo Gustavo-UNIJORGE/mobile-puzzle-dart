@@ -24,7 +24,7 @@ class Settings extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               SizedBox(
-                width: 128,
+                width: 80,
                 child: TextButton(
                     onPressed: () async => puzzle.list.changeLevel(context),  
                     child: Text('Nível: ${puzzle.list.level}')
@@ -36,7 +36,7 @@ class Settings extends StatelessWidget {
         IconButton(
           color: Theme.of(context).primaryColor,
           onPressed: puzzle.list.shuffle, 
-          icon: Icon(Icons.refresh) 
+          icon:  Icon(Icons.refresh) 
         ),
       ]
     );
