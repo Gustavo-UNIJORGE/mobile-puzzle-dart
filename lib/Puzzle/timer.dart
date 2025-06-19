@@ -64,11 +64,24 @@ class TimerController extends ChangeNotifier {
 
   Duration get elapsed => _stopwatch.elapsed;
   bool get isRunning => _stopwatch.isRunning;
-  
-  void start() {
+
+  TimerController() {
+    _setTimer();
+  }
+
+  void _setTimer() {
+    // if(_timer.isActive) _timer.cancel();
     _timer = Timer.periodic(
     Duration(milliseconds: refreshRate), (_) => notifyListeners());
+  }
 
+  void setup() {
+    _setTimer();
+    notifyListeners();
+  }
+
+  void start() {
+    _setTimer();
     _stopwatch.start();    
     notifyListeners();
   }
@@ -76,14 +89,11 @@ class TimerController extends ChangeNotifier {
   void stop() {
     _stopwatch.stop();
     _timer.cancel();
-    _timer;
     notifyListeners();
   }
 
   void resume() {
-    _timer = Timer.periodic(
-    Duration(milliseconds: refreshRate), (_) => notifyListeners());
-
+    _setTimer();
     _stopwatch.start();
     notifyListeners();
   }
