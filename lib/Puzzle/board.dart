@@ -61,7 +61,7 @@ class BoardController extends ChangeNotifier {
   void changeLevel(BuildContext context) async {
     _timer.stop();
     // O usuário define o nível nas opções do dialog
-    final int? selected = await showLevelDialog(context);
+    final int? selected = await changeLevelDialog(context);
     if (selected != null && selected != level) {
       level = selected;
       _list.generate(level);
@@ -82,7 +82,7 @@ class BoardController extends ChangeNotifier {
     _timer.reset();
     _list.shuffle(level);
     rounds = 0;
-    
+
     notifyListeners();
   }
 }

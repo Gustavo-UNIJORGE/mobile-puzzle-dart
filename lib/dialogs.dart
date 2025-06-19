@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:puzzle_mobile/Puzzle/puzzle.dart';
 
-Future<int?> showLevelDialog(BuildContext context) async {
+Future<int?> changeLevelDialog(BuildContext context) async {
   return await showDialog<int>(
     context: context,
     builder: (BuildContext context) {
