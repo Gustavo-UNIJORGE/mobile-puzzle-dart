@@ -35,7 +35,7 @@ class Settings extends StatelessWidget {
         ),
         IconButton(
           color: Theme.of(context).primaryColor,
-          onPressed: () => puzzle.list.shuffle(puzzle.board.level), 
+          onPressed: () => puzzle.board.restartPuzzle(context), 
           icon:  Icon(Icons.refresh) 
         ),
       ]

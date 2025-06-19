@@ -73,10 +73,16 @@ class BoardController extends ChangeNotifier {
   //TODO: implementar restart no controlador do jogo
   void restartPuzzle(BuildContext context) async {
     _timer.stop();
-    final bool selected = await showShuffleDialog(context);
-    if(selected) {
-      _list.shuffle(level);
-    }
+    if(rounds > 0) {
+      final bool selected = await showShuffleDialog(context);
+      if(!selected) {
+        return notifyListeners();
+      }
+    } 
+    _timer.reset();
+    _list.shuffle(level);
+    rounds = 0;
+    
     notifyListeners();
   }
 }
