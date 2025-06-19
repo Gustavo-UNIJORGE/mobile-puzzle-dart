@@ -34,8 +34,8 @@ Future<int?> changeLevelDialog(BuildContext context) async {
   );
 }
 
-Future<bool> showShuffleDialog(BuildContext context) async {
-  return await showDialog(
+Future<bool?> alertShuffleDialog(BuildContext context) async {
+  return await showDialog<bool>(
     context: context, 
     builder: (BuildContext context) {
       return AlertDialog(
@@ -51,7 +51,7 @@ Future<bool> showShuffleDialog(BuildContext context) async {
         actions: [
           TextButton (
             onPressed: () => Navigator.pop(context, true),
-            child: Text('Confirmar')
+            child: Text('Confirmar', style: TextStyle(color: Colors.redAccent),)
           ),
           TextButton (
             onPressed: () => Navigator.pop(context, false),

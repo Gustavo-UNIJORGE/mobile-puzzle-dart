@@ -74,9 +74,10 @@ class BoardController extends ChangeNotifier {
   void restartPuzzle(BuildContext context) async {
     _timer.stop();
     if(rounds > 0) {
-      final bool selected = await showShuffleDialog(context);
-      if(!selected) {
-        return notifyListeners();
+      final bool? selected = await alertShuffleDialog(context);
+      // Se o usuário não confirmar
+      if(selected != true) { 
+        return;  // não deve acontece nada
       }
     } 
     _timer.reset();
