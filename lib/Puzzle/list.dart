@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:puzzle_mobile/Puzzle/timer.dart';
-import 'package:puzzle_mobile/dialogs.dart';
 
 class ListController extends ChangeNotifier {
-  List<int> items = List.generate((4 - 1), (i) => i + 1)..add(0);
+  List<int> items = List.generate((4), (i) => i + 1);
   late final TimerController _timer;
 
-  void setTimerController(TimerController timer) {
-    _timer = timer;
-  }
+  void setTimerController(TimerController timer) =>_timer = timer;
 
   int get _swapCount {
     int count = 0;
@@ -43,7 +40,6 @@ class ListController extends ChangeNotifier {
     final int length = (level * level);
     // Gera a lista de 1 a level^2 e embaralha os valores
     items = List.generate(length - 1, (i) => i + 1);
-    // if (canBeSolvable == false) generate();
     notifyListeners();
   }
 

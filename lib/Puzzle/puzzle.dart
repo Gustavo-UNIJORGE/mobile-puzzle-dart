@@ -13,14 +13,11 @@ class Puzzle extends StatelessWidget {
     return Padding(
       padding: EdgeInsetsGeometry.symmetric(horizontal: 64, vertical: 16),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           TimerSettings(),
           Settings(),   
-          AspectRatio(
-            aspectRatio: 1,
-            child: Board()
-          )
+          Expanded(child: Board()),
         ],
       ),
     );

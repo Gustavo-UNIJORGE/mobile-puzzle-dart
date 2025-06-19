@@ -17,22 +17,26 @@ class Board extends StatelessWidget {
     return GridView.count(
       crossAxisCount: puzzle.board.level,
       padding: EdgeInsets.all(64),
+      childAspectRatio: 1,
       children: [for (var value in puzzle.list.items) 
         ElevatedButton(
-          onPressed: value == 0 ? puzzle.board.makeMovement : null,
+          onPressed: value == puzzle.board.length ? puzzle.board.makeMovement : null,
           style: ElevatedButton.styleFrom(
             shape: LinearBorder(),
           ),
-          child:Text(value > 0 ? '$value' : '', 
-            textScaler: TextScaler.linear(3.0),)
+          child:Text(value < puzzle.board.length ? '$value' : '', 
+            textScaler: TextScaler.linear(3.0),
+          )
         )
       ]
     );
+  
   }
 }
 
 class BoardController extends ChangeNotifier {
   int level = 2; // Nível do Puzzle
+  int get length => (level*level); // Tamanho do Puzzle (número de espaços)
   // TODO: implementar rounds no controlador do jogo
   int rounds = 0; // Numero de Jogadas
   
