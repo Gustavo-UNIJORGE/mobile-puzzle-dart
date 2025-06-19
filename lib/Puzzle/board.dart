@@ -18,18 +18,42 @@ class Board extends StatelessWidget {
       crossAxisCount: puzzle.board.level,
       padding: EdgeInsets.all(64),
       childAspectRatio: 1,
-      children: [for (var value in puzzle.list.items) 
+      children: [for (int pos = 0; pos < puzzle.list.length; pos++) 
         ElevatedButton(
-          onPressed: value == puzzle.board.length ? puzzle.board.makeMovement : null,
+          onPressed: 
+            puzzle.board.isNeighbourOfEmpty(pos) ? () => puzzle.board.makeMovement(pos) : null,
           style: ElevatedButton.styleFrom(
-            shape: LinearBorder(),
+            shape: BeveledRectangleBorder(),
           ),
-          child:Text(value < puzzle.board.length ? '$value' : '', 
-            textScaler: TextScaler.linear(3.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text('$pos', /* Space Index */ 
+                textAlign: TextAlign.start,
+              ),
+              Expanded(
+                child: Container(  /* Space Value */
+                  alignment: AlignmentGeometry.center,
+                  child: Text(
+                    (pos < puzzle.list.length - 1) ? '${puzzle.list.items[pos]}' : '', 
+                    style: 
+                      TextStyle(
+                        fontWeight: FontWeight.bold
+
+                      ),
+                    textDirection: TextDirection.rtl,
+
+                    textAlign: TextAlign.center,
+                    textScaler: TextScaler.linear(3.0),
+                  )
+                )
+                
+              ),
+            ],
           )
-        )
+        ),
       ]
-    );
+  );
   
   }
 }
@@ -39,6 +63,7 @@ class BoardController extends ChangeNotifier {
   int get length => (level*level); // Tamanho do Puzzle (número de espaços)
   // TODO: implementar rounds no controlador do jogo
   int rounds = 0; // Numero de Jogadas
+  int emptyPosition = 0;
   
   ListController _list = ListController();
   TimerController _timer = TimerController();
@@ -47,14 +72,27 @@ class BoardController extends ChangeNotifier {
 
   void setTimerController(timer) => _timer = timer;
 
+  bool isNeighbourOfEmpty(position) {
+    int emptyPosition = (level * level) - 1;
+    
+    return (position == emptyPosition 
+      || position + 1 == emptyPosition 
+      || position - 1 == emptyPosition
+      || position + level == emptyPosition 
+      || position - (level - 1) == emptyPosition
+    );
+  }
+
   // TODO: implementar increaseRounds no controlador do jogo
   void increaseRounds() {
     rounds++;
     notifyListeners();
   }
 
-  void makeMovement() {
-    // _list.increaseRounds();
+  void makeMovement(position) {
+    print('clickedPosition: $position');
+    _list.swap(position, emptyPosition);
+
     rounds++;
     _timer.start();
     notifyListeners();

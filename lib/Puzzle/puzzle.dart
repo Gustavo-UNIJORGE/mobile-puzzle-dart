@@ -50,6 +50,9 @@ class PuzzleController extends ChangeNotifier{
     board.rounds = 0;
   }
 
+  // List<Widget> setBoardSpaces() {
+  //   return board.setSpaces();
+  // }
   // void _resetTimer() {
   //   timer.reset();
   // }
