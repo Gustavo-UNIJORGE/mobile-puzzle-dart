@@ -56,28 +56,15 @@ class TimerSettings extends StatelessWidget {
     );
   }
 }
-// TODO: Entender porque TimeController é ChangeNotifier e nao um State
+
 class TimerController extends ChangeNotifier {
   final refreshRate = 100;
   final Stopwatch _stopwatch = Stopwatch();
   late Timer _timer;
-  // late final Timer _timer;
-  // late final _timer = Timer.periodic(
-  //   Duration(milliseconds: refreshRate), (_) => notifyListeners());
-  
+
   Duration get elapsed => _stopwatch.elapsed;
   bool get isRunning => _stopwatch.isRunning;
   
-  /* 
-  @override
-  void addListener(VoidCallback listener) {
-    _timer = Timer.periodic(
-    Duration(milliseconds: refreshRate), (_) => notifyListeners());
-    super.addListener(listener);
-  } 
-  */
-
-
   void start() {
     _timer = Timer.periodic(
     Duration(milliseconds: refreshRate), (_) => notifyListeners());
