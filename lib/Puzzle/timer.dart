@@ -1,16 +1,18 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:puzzle_mobile/Puzzle/puzzle.dart';
 
 class TimerSettings extends StatelessWidget {
-  final TimerController timer;
   const TimerSettings({
     super.key, 
-    required this.timer
   });
 
   @override
   Widget build(BuildContext context) {
+    final TimerController timer = context.watch<PuzzleController>().timer;
+
     return Row( /* Stopwatch */
       mainAxisAlignment: MainAxisAlignment.center,
       children: [  
@@ -58,54 +60,58 @@ class TimerSettings extends StatelessWidget {
 class TimerController extends ChangeNotifier {
   final refreshRate = 100;
   final Stopwatch _stopwatch = Stopwatch();
-  Timer? _timer;
+  late Timer _timer;
+  // late final Timer _timer;
+  // late final _timer = Timer.periodic(
+  //   Duration(milliseconds: refreshRate), (_) => notifyListeners());
+  
   Duration get elapsed => _stopwatch.elapsed;
   bool get isRunning => _stopwatch.isRunning;
+  
+  /* 
+  @override
+  void addListener(VoidCallback listener) {
+    _timer = Timer.periodic(
+    Duration(milliseconds: refreshRate), (_) => notifyListeners());
+    super.addListener(listener);
+  } 
+  */
+
 
   void start() {
-    if(_timer != null) return;
-
-    _stopwatch.start();
     _timer = Timer.periodic(
-        Duration(milliseconds: refreshRate), (_) {
-      notifyListeners();
-    });
-    
+    Duration(milliseconds: refreshRate), (_) => notifyListeners());
+
+    _stopwatch.start();    
     notifyListeners();
   }
 
   void stop() {
     _stopwatch.stop();
-    _timer?.cancel();
-    _timer = null;
-
+    _timer.cancel();
+    _timer;
     notifyListeners();
   }
 
   void resume() {
-    if (_timer == null) {
-      _timer = Timer.periodic(
-          Duration(milliseconds: refreshRate), (_) {
-        notifyListeners();
-      });
-      _stopwatch.start();
-      notifyListeners();
-    } else {
-      return;
-    }
+    _timer = Timer.periodic(
+    Duration(milliseconds: refreshRate), (_) => notifyListeners());
+
+    _stopwatch.start();
+    notifyListeners();
   }
 
   void reset() {
     _stopwatch.stop();
     _stopwatch.reset();
-    _timer?.cancel();
-    _timer = null;
+    _timer.cancel();
     notifyListeners();
   }
 
   @override
   void dispose() {
-    _timer?.cancel();
+    _stopwatch.stop();
+    _timer.cancel();
     super.dispose();
   }
 }

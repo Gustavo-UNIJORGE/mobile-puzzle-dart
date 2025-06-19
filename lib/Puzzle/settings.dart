@@ -9,15 +9,19 @@ class Settings extends StatelessWidget {
   Widget build(BuildContext context) {
     final puzzle = context.watch<PuzzleController>();
 
-    return Row( /* Game Settings */
+    return Row( 
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Expanded(child: Text('${puzzle.rounds} jogadas', textAlign: TextAlign.end,)),
+        Expanded(child: 
+          Text('${puzzle.list.rounds} jogadas', 
+            textAlign: TextAlign.end,
+          )
+        ),
         SizedBox(
           width: 128,
           child: TextButton(
-            onPressed: () async => puzzle.changeLevel(context),  
-            child: Text('Nível: ${puzzle.level}')
+            onPressed: () async => puzzle.list.changeLevel(context),  
+            child: Text('Nível: ${puzzle.list.level}')
           ) 
         ),
       ]

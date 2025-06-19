@@ -4,19 +4,41 @@ import 'package:provider/provider.dart';
 import 'package:puzzle_mobile/Puzzle/settings.dart';
 import 'package:puzzle_mobile/Puzzle/timer.dart';
 
-class Canvas extends StatelessWidget {
-  const Canvas({super.key});
+class Puzzle extends StatelessWidget {
+  const Puzzle({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final timer = context.watch<TimerController>();
+    // final puzzle = context.watch<PuzzleController>();
+
+    return Padding(
+      padding: EdgeInsetsGeometry.symmetric(horizontal: 64, vertical: 16),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          TimerSettings(),
+          Settings(),
+          Expanded(child: Canvas())
+        ],
+      ),
+    );
+  }
+}
+
+class Canvas extends StatelessWidget {
+  const Canvas({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     final puzzle = context.watch<PuzzleController>();
 
     return GridView.count(
-      crossAxisCount: puzzle.level,
+      crossAxisCount: puzzle.list.level,
       padding: EdgeInsets.all(64),
 
-      children: [for (var value in puzzle.list) 
+      children: [for (var value in puzzle.list.items) 
         ElevatedButton(
           onPressed: null,
           style: ElevatedButton.styleFrom(
@@ -25,10 +47,7 @@ class Canvas extends StatelessWidget {
           child:Text('$value')
         ),
         ElevatedButton(
-          onPressed: () {
-            puzzle.rounds++;
-            timer.start();
-          },
+          onPressed: () => puzzle.makeMovement(),
           style: ElevatedButton.styleFrom(
             shape: LinearBorder(),
           ),
@@ -39,55 +58,75 @@ class Canvas extends StatelessWidget {
   }
 }
 
-class Puzzle extends StatelessWidget {
-  const Puzzle({super.key});
+class PuzzleController extends ChangeNotifier{
+  final TimerController timer = TimerController();
+  final ListController list = ListController();
+
+  PuzzleController() { 
+    list.setTimerController(timer);
+    timer.addListener(_handleTimerUpdate);
+    list.addListener(_handleListUpdate);
+  }
+
+  void _handleTimerUpdate() {
+    notifyListeners();
+  }
+
+  void _handleListUpdate() {
+    notifyListeners();
+  }
 
   @override
-  Widget build(BuildContext context) {
-    final timer = context.watch<TimerController>();
-    // final puzzle = context.watch<PuzzleController>();
-
-    return Padding(
-      padding: EdgeInsetsGeometry.symmetric(horizontal: 64, vertical: 16),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          TimerSettings(timer: timer),
-          Settings(),
-          Expanded(child: Canvas())
-        ],
-      ),
-    );
+  void dispose() {
+    timer.dispose();
+    list.dispose();
+    super.dispose();
   }
+
+  void makeMovement() {
+    list.increaseRounds();
+    timer.start();
+    notifyListeners();
+  }
+  
 }
 
-class PuzzleController extends ChangeNotifier {
+class ListController extends ChangeNotifier {
   int level = 2; // Nível do Puzzle
-  List<int> list = List.generate((4 - 1), (i) => i + 1)..shuffle();
+  List<int> items = List.generate((4 - 1), (i) => i + 1)..shuffle();
   int rounds = 0; // Numero de Jogadas
-  TimerController? _timerController;
+  late final TimerController _timer;
+
+  void setTimerController(TimerController timer) {
+    _timer = timer;
+  }
+
+  void increaseRounds() {
+    rounds++;
+    notifyListeners();
+  }
 
   void generatePuzzle() {
     // O puzzle é gerado a partir do nível selecionado
     // Gera a lista de 1 a level^2 e embaralha os valores
-    list = List.generate(((level * level) - 1), (i) => i + 1)..shuffle(); 
+    items = List.generate(((level * level) - 1), (i) => i + 1)..shuffle(); 
     notifyListeners();
   }
 
   void shuffleList() {
-    if (list.length > 1) {
-      list.shuffle();
+    if (items.length > 1) {
+      items.shuffle();
     } else {
       generatePuzzle();
     }
     rounds = 0;
-    _timerController?.reset();
+    _timer.reset();
     notifyListeners();
 
   }
 
   void changeLevel(BuildContext context) async {
-    _timerController?.stop();
+    _timer.stop();
     // O usuário define o nível nas opções do dialog
     final int? selected = await _showLevelDialog(context);
     if (selected != null && selected != level) {
@@ -95,14 +134,14 @@ class PuzzleController extends ChangeNotifier {
       generatePuzzle();
       shuffleList();
       notifyListeners();
-      return _timerController?.reset();
+      return _timer.reset();
     }
     notifyListeners();
-    return _timerController?.resume();
+    return _timer.resume();
   }
 
   void restartPuzzle(BuildContext context) async {
-    _timerController?.stop();
+    _timer.stop();
     final bool selected = await _showShuffleDialog(context);
     if(selected) {
       shuffleList();
@@ -116,7 +155,6 @@ Future<int?> _showLevelDialog(BuildContext context) async {
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        // actionsAlignment: MainAxisAlignment.center,
         title: const Text('Nível de Dificuldade', style: TextStyle(
           fontWeight: FontWeight.bold,
           ),
