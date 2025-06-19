@@ -35,7 +35,7 @@ class PuzzleController extends ChangeNotifier{
 
   PuzzleController() { 
     list.setTimerController(timer);
-    
+
     board.setListController(list);
     board.setTimerController(timer);
 
@@ -48,6 +48,14 @@ class PuzzleController extends ChangeNotifier{
     notifyListeners();
   }
 
+  void resetCounts() {
+    timer.reset();
+    board.rounds = 0;
+  }
+
+  // void _resetTimer() {
+  //   timer.reset();
+  // }
 
   @override
   void dispose() {
@@ -55,7 +63,5 @@ class PuzzleController extends ChangeNotifier{
     list.dispose();
     super.dispose();
   }
-
-  
 }
 

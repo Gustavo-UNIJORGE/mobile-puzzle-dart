@@ -11,7 +11,8 @@ class TimerSettings extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TimerController timer = context.watch<PuzzleController>().timer;
+    // final TimerController timer = context.watch<PuzzleController>().timer;
+    final PuzzleController puzzle =  context.watch<PuzzleController>();
 
     return Row( /* Stopwatch */
       mainAxisAlignment: MainAxisAlignment.center,
@@ -19,14 +20,14 @@ class TimerSettings extends StatelessWidget {
         SizedBox( /* Reset Button */
           width: 128,
           child: ElevatedButton(
-            onPressed: timer.elapsed.inMilliseconds > 0 
-              ? timer.reset 
+            onPressed: puzzle.timer.elapsed.inMilliseconds > 0 
+              ? puzzle.resetCounts
               : null, 
             child: Text('Reset')
           ) 
         ),
         Expanded(child: /* Timer */
-          Text('${timer.elapsed}', 
+          Text('${puzzle.timer.elapsed}', 
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 24,
@@ -38,17 +39,17 @@ class TimerSettings extends StatelessWidget {
           width: 128,
           child: ElevatedButton(
             onPressed: 
-              timer.elapsed.inMilliseconds > 0 
-                ? (timer.isRunning  
-                  ? timer.stop 
-                  : timer.resume
-                ) : null,
+              (puzzle.timer.isRunning  
+                ? puzzle.timer.stop 
+                : puzzle.timer.resume
+              ),
             child: Text(
-              timer.elapsed.inMilliseconds > 0 
-                ? (timer.isRunning 
-                  ? 'Parar' 
-                  : 'Retornar'
-                ) : 'Iniciar'), 
+              puzzle.timer.elapsed.inMilliseconds > 0  
+              ? (puzzle.timer.isRunning 
+                ? 'Parar' 
+                : 'Retornar'
+              ) : 'Iniciar'
+            ), 
           ) 
         ),
         

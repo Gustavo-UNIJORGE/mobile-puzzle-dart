@@ -33,6 +33,7 @@ class Board extends StatelessWidget {
 
 class BoardController extends ChangeNotifier {
   int level = 2; // Nível do Puzzle
+  // TODO: implementar rounds no controlador do jogo
   int rounds = 0; // Numero de Jogadas
   
   ListController _list = ListController();
@@ -42,7 +43,7 @@ class BoardController extends ChangeNotifier {
 
   void setTimerController(timer) => _timer = timer;
 
-  // TODO: implementar rounds diretamente no puzzle
+  // TODO: implementar increaseRounds no controlador do jogo
   void increaseRounds() {
     rounds++;
     notifyListeners();
@@ -56,7 +57,7 @@ class BoardController extends ChangeNotifier {
   }
 
   
-  //TODO: implementar level diretamente no puzzle
+  //TODO: implementar level no controlador do jogo
   void changeLevel(BuildContext context) async {
     _timer.stop();
     // O usuário define o nível nas opções do dialog
@@ -72,7 +73,7 @@ class BoardController extends ChangeNotifier {
     notifyListeners();
     // return _timer.resume();
   }
-  //TODO: implementar restart diretamente no puzzle
+  //TODO: implementar restart no controlador do jogo
   void restartPuzzle(BuildContext context) async {
     _timer.stop();
     final bool selected = await showShuffleDialog(context);
