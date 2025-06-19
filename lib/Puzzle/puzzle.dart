@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:puzzle_mobile/Puzzle/board.dart';
 import 'package:puzzle_mobile/Puzzle/list.dart';
 import 'package:puzzle_mobile/Puzzle/settings.dart';
 import 'package:puzzle_mobile/Puzzle/timer.dart';
@@ -26,48 +27,27 @@ class Puzzle extends StatelessWidget {
   }
 }
 
-class Board extends StatelessWidget {
-  const Board({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final puzzle = context.watch<PuzzleController>();
-
-    return GridView.count(
-      crossAxisCount: puzzle.list.level,
-      padding: EdgeInsets.all(64),
-      children: [for (var value in puzzle.list.items) 
-        ElevatedButton(
-          onPressed: value == 0 ? puzzle.makeMovement : null,
-          style: ElevatedButton.styleFrom(
-            shape: LinearBorder(),
-          ),
-          child:Text(value > 0 ? '$value' : '')
-        )
-      ]
-    );
-  }
-}
 
 class PuzzleController extends ChangeNotifier{
   final TimerController timer = TimerController();
   final ListController list = ListController();
+  final BoardController board = BoardController();
 
   PuzzleController() { 
     list.setTimerController(timer);
-    timer.addListener(_handleTimerUpdate);
-    list.addListener(_handleListUpdate);
+    
+    board.setListController(list);
+    board.setTimerController(timer);
+
+    timer.addListener(_handleUpdate);
+    list.addListener(_handleUpdate);
+    board.addListener(_handleUpdate);
   }
 
-  void _handleTimerUpdate() {
+  void _handleUpdate() {
     notifyListeners();
   }
 
-  void _handleListUpdate() {
-    notifyListeners();
-  }
 
   @override
   void dispose() {
@@ -76,11 +56,6 @@ class PuzzleController extends ChangeNotifier{
     super.dispose();
   }
 
-  void makeMovement() {
-    list.increaseRounds();
-    timer.start();
-    notifyListeners();
-  }
   
 }
 

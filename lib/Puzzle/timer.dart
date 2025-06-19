@@ -72,7 +72,10 @@ class TimerController extends ChangeNotifier {
   void _setTimer() {
     // if(_timer.isActive) _timer.cancel();
     _timer = Timer.periodic(
-    Duration(milliseconds: refreshRate), (_) => notifyListeners());
+      Duration(
+        milliseconds: refreshRate), 
+      (_) => notifyListeners()
+    );
   }
 
   void setup() {
