@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:puzzle_mobile/Puzzle/list.dart';
 import 'package:puzzle_mobile/Puzzle/puzzle.dart';
 import 'package:puzzle_mobile/Puzzle/timer.dart';
+import 'package:puzzle_mobile/dialogs.dart';
 
 class Board extends StatelessWidget {
   const Board({
@@ -14,7 +15,7 @@ class Board extends StatelessWidget {
     final puzzle = context.watch<PuzzleController>();
 
     return GridView.count(
-      crossAxisCount: puzzle.list.level,
+      crossAxisCount: puzzle.board.level,
       padding: EdgeInsets.all(64),
       children: [for (var value in puzzle.list.items) 
         ElevatedButton(
@@ -31,16 +32,53 @@ class Board extends StatelessWidget {
 }
 
 class BoardController extends ChangeNotifier {
-  ListController list = ListController();
-  TimerController timer = TimerController();
+  int level = 2; // Nível do Puzzle
+  int rounds = 0; // Numero de Jogadas
+  
+  ListController _list = ListController();
+  TimerController _timer = TimerController();
 
-  void setListController(list) => this.list = list;
+  void setListController(list) => _list = list;
 
-  void setTimerController(timer) => this.timer = timer;
+  void setTimerController(timer) => _timer = timer;
+
+  // TODO: implementar rounds diretamente no puzzle
+  void increaseRounds() {
+    rounds++;
+    notifyListeners();
+  }
 
   void makeMovement() {
-    list.increaseRounds();
-    timer.start();
+    // _list.increaseRounds();
+    rounds++;
+    _timer.start();
+    notifyListeners();
+  }
+
+  
+  //TODO: implementar level diretamente no puzzle
+  void changeLevel(BuildContext context) async {
+    _timer.stop();
+    // O usuário define o nível nas opções do dialog
+    final int? selected = await showLevelDialog(context);
+    if (selected != null && selected != level) {
+      level = selected;
+      _list.generate(level);
+      _list.shuffle(level);
+      _timer.setup();
+    } else {
+      if(_timer.elapsed > Duration.zero) _timer.resume();
+    }
+    notifyListeners();
+    // return _timer.resume();
+  }
+  //TODO: implementar restart diretamente no puzzle
+  void restartPuzzle(BuildContext context) async {
+    _timer.stop();
+    final bool selected = await showShuffleDialog(context);
+    if(selected) {
+      _list.shuffle(level);
+    }
     notifyListeners();
   }
 }

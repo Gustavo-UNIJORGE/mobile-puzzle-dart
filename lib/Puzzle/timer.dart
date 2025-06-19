@@ -60,14 +60,10 @@ class TimerSettings extends StatelessWidget {
 class TimerController extends ChangeNotifier {
   final refreshRate = 100;
   final Stopwatch _stopwatch = Stopwatch();
-  late Timer _timer;
+  late Timer _timer = Timer.periodic(Duration(milliseconds: 100), (timer) => notifyListeners());
 
   Duration get elapsed => _stopwatch.elapsed;
   bool get isRunning => _stopwatch.isRunning;
-
-  TimerController() {
-    _setTimer();
-  }
 
   void _setTimer() {
     // if(_timer.isActive) _timer.cancel();
