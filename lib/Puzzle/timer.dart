@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:puzzle_mobile/Puzzle/puzzle.dart';
@@ -41,7 +40,7 @@ class TimerSettings extends StatelessWidget {
             onPressed: 
               (puzzle.timer.isRunning  
                 ? puzzle.timer.stop 
-                : puzzle.timer.resume
+                : puzzle.timer.start
               ),
             child: Text(
               puzzle.timer.elapsed.inMilliseconds > 0  
@@ -59,42 +58,21 @@ class TimerSettings extends StatelessWidget {
 }
 
 class TimerController extends ChangeNotifier {
-  final refreshRate = 100;
   final Stopwatch _stopwatch = Stopwatch();
-  late Timer _timer = Timer.periodic(Duration(milliseconds: 100), (timer) => notifyListeners());
+  Timer _timer = Timer.periodic(Duration(milliseconds: 100), (timer) {});
 
   Duration get elapsed => _stopwatch.elapsed;
   bool get isRunning => _stopwatch.isRunning;
-
-  void _setTimer() {
-    // if(_timer.isActive) _timer.cancel();
-    _timer = Timer.periodic(
-      Duration(
-        milliseconds: refreshRate), 
-      (_) => notifyListeners()
-    );
-  }
-
-  void setup() {
-    _setTimer();
-    notifyListeners();
-  }
+  bool get alreadyRan => _stopwatch.elapsed > Duration.zero;
 
   void start() {
-    _setTimer();
+    _timer = Timer.periodic(Duration(milliseconds: 100), (timer) => notifyListeners());
     _stopwatch.start();    
     notifyListeners();
   }
 
   void stop() {
     _stopwatch.stop();
-    _timer.cancel();
-    notifyListeners();
-  }
-
-  void resume() {
-    _setTimer();
-    _stopwatch.start();
     notifyListeners();
   }
 

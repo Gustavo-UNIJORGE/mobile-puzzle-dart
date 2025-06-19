@@ -66,10 +66,7 @@ class BoardController extends ChangeNotifier {
       level = selected;
       _list.generate(level);
       _list.shuffle(level);
-      _timer.setup();
-    } else {
-      if(_timer.elapsed > Duration.zero) _timer.resume();
-    }
+    } 
     notifyListeners();
     // return _timer.resume();
   }
