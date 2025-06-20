@@ -62,3 +62,28 @@ Future<bool?> alertShuffleDialog(BuildContext context) async {
     }
   );
 }
+
+Future<bool> congratulationsDialog(BuildContext context) async {
+  return await showDialog(
+    context: context, 
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('Voce venceu!', 
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          )
+        ),
+        content: 
+          const SingleChildScrollView(
+            child: Text('Deseja jogar novamente?')
+          ),
+        actions: [
+          TextButton (
+            onPressed: () => Navigator.pop(context, true),
+            child: Text('Confirmar')
+          ),
+        ] 
+      );
+    }
+  );
+}

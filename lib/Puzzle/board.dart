@@ -19,7 +19,7 @@ class Board extends StatelessWidget {
         ElevatedButton(
           onPressed: 
             puzzle.board.isNeighbourOfEmpty(pos) 
-            ? () => puzzle.makeMovement(pos) 
+            ? () => puzzle.makeMovement(context, pos) 
             : null,
           style: ElevatedButton.styleFrom(
             shape: BeveledRectangleBorder(),
