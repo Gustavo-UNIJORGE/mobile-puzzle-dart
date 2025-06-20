@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:puzzle_mobile/Puzzle/list.dart';
 import 'package:puzzle_mobile/Puzzle/puzzle.dart';
-import 'package:puzzle_mobile/Puzzle/timer.dart';
-import 'package:puzzle_mobile/dialogs.dart';
 
 class Board extends StatelessWidget {
   const Board({
@@ -13,15 +10,17 @@ class Board extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final puzzle = context.watch<PuzzleController>();
-
+    
     return GridView.count(
       crossAxisCount: puzzle.board.level,
       padding: EdgeInsets.all(64),
       childAspectRatio: 1,
-      children: [for (int pos = 0; pos < puzzle.list.length; pos++) 
+      children: [for (int pos in puzzle.board.positions) 
         ElevatedButton(
           onPressed: 
-            puzzle.board.isNeighbourOfEmpty(pos) ? () => puzzle.board.makeMovement(pos) : null,
+            puzzle.board.isNeighbourOfEmpty(pos) 
+            ? () => puzzle.makeMovement(pos) 
+            : null,
           style: ElevatedButton.styleFrom(
             shape: BeveledRectangleBorder(),
           ),
@@ -35,7 +34,8 @@ class Board extends StatelessWidget {
                 child: Container(  /* Space Value */
                   alignment: AlignmentGeometry.center,
                   child: Text(
-                    (pos < puzzle.list.length - 1) ? '${puzzle.list.items[pos]}' : '', 
+                    /* empty position is here */
+                    puzzle.board.values[pos] > 0 ? '${puzzle.board.values[pos]}' : '',
                     style: 
                       TextStyle(
                         fontWeight: FontWeight.bold
@@ -60,72 +60,40 @@ class Board extends StatelessWidget {
 
 class BoardController extends ChangeNotifier {
   int level = 2; // Nível do Puzzle
-  int get length => (level*level); // Tamanho do Puzzle (número de espaços)
-  // TODO: implementar rounds no controlador do jogo
-  int rounds = 0; // Numero de Jogadas
-  int emptyPosition = 0;
-  
-  ListController _list = ListController();
-  TimerController _timer = TimerController();
+  int get positionsCount => (level*level); // Tamanho do Puzzle : l = n*n (ex: 3*3 = 9)
+  List<int> get positions => List.generate(positionsCount, (i) => i); // [0, ..., (l - 1)]
+  List<int> values = []; // Array com os valores embaralhados de 1 a 9. (9 elementos)
 
-  void setListController(list) => _list = list;
+  int get emptyPosition => values.indexOf(0);
 
-  void setTimerController(timer) => _timer = timer;
+  bool isNeighbourOfEmpty(position) {    
 
-  bool isNeighbourOfEmpty(position) {
-    int emptyPosition = (level * level) - 1;
-    
+    bool atTopOfEmpty = (position + level) == emptyPosition; 
+    bool atBottomOfEmpty = (position - level) == emptyPosition;
+    bool atRightOfEmpty = position == emptyPosition + 1 && position%level != 0;
+    bool atLeftOfEmpty = position == emptyPosition - 1  && emptyPosition%level != 0; 
+
     return (position == emptyPosition 
-      || position + 1 == emptyPosition 
-      || position - 1 == emptyPosition
-      || position + level == emptyPosition 
-      || position - (level - 1) == emptyPosition
+      || atTopOfEmpty
+      || atRightOfEmpty
+      || atLeftOfEmpty 
+      || atBottomOfEmpty
     );
   }
-
-  // TODO: implementar increaseRounds no controlador do jogo
-  void increaseRounds() {
-    rounds++;
-    notifyListeners();
-  }
-
-  void makeMovement(position) {
-    print('clickedPosition: $position');
-    _list.swap(position, emptyPosition);
-
-    rounds++;
-    _timer.start();
-    notifyListeners();
-  }
-
   
-  //TODO: implementar level no controlador do jogo
-  void changeLevel(BuildContext context) async {
-    _timer.stop();
-    // O usuário define o nível nas opções do dialog
-    final int? selected = await changeLevelDialog(context);
-    if (selected != null && selected != level) {
-      level = selected;
-      _list.generate(level);
-      _list.shuffle(level);
-    } 
+  void generate() {
+    /* Preenche o array com valores de (0 + 1) até  */
+    values = List.generate(positionsCount - 1, (i) => i + 1)..shuffle()..add(0);
+    print(values);
     notifyListeners();
-    // return _timer.resume();
   }
-  //TODO: implementar restart no controlador do jogo
-  void restartPuzzle(BuildContext context) async {
-    _timer.stop();
-    if(rounds > 0) {
-      final bool? selected = await alertShuffleDialog(context);
-      // Se o usuário não confirmar
-      if(selected != true) { 
-        return;  // não deve acontece nada
-      }
-    } 
-    _timer.reset();
-    _list.shuffle(level);
-    rounds = 0;
 
+  void swapPositions(positionA, positionB) {
+    int valueA = values[positionA];
+    int valueB = values[positionB];
+
+    values[positionA] = valueB;
+    values[positionB] = valueA;
     notifyListeners();
   }
 }

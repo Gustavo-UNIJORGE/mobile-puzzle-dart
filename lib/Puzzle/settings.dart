@@ -15,7 +15,7 @@ class Settings extends StatelessWidget {
         SizedBox(
           height: 32,
           width: 128,
-          child: Text('${puzzle.board.rounds} jogadas', 
+          child: Text('${puzzle.rounds} jogadas', 
             textAlign: TextAlign.center,
           ),
         ),
@@ -26,7 +26,7 @@ class Settings extends StatelessWidget {
               SizedBox(
                 width: 80,
                 child: TextButton(
-                    onPressed: () async => puzzle.board.changeLevel(context),  
+                    onPressed: () async => puzzle.changeLevel(context),  
                     child: Text('Nível: ${puzzle.board.level}')
                   ),
                 ), 
@@ -35,7 +35,7 @@ class Settings extends StatelessWidget {
         ),
         IconButton(
           color: Theme.of(context).primaryColor,
-          onPressed: () => puzzle.board.restartPuzzle(context), 
+          onPressed: () => puzzle.restart(context), 
           icon:  Icon(Icons.refresh) 
         ),
       ]

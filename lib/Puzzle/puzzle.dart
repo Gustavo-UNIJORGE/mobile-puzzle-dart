@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:puzzle_mobile/Puzzle/board.dart';
 import 'package:puzzle_mobile/Puzzle/list.dart';
 import 'package:puzzle_mobile/Puzzle/settings.dart';
 import 'package:puzzle_mobile/Puzzle/timer.dart';
+import 'package:puzzle_mobile/dialogs.dart';
 
 class Puzzle extends StatelessWidget {
   const Puzzle({super.key});
@@ -26,6 +26,8 @@ class Puzzle extends StatelessWidget {
 
 
 class PuzzleController extends ChangeNotifier{
+  int rounds = 0; // Numero de Jogadas
+
   final TimerController timer = TimerController();
   final ListController list = ListController();
   final BoardController board = BoardController();
@@ -33,32 +35,67 @@ class PuzzleController extends ChangeNotifier{
   PuzzleController() { 
     list.setTimerController(timer);
 
-    board.setListController(list);
-    board.setTimerController(timer);
-
     timer.addListener(_handleUpdate);
     list.addListener(_handleUpdate);
     board.addListener(_handleUpdate);
+
+    board.generate();
   }
 
   void _handleUpdate() {
     notifyListeners();
   }
 
-  void resetCounts() {
-    timer.reset();
-    board.rounds = 0;
+  void makeMovement(position) {
+    increaseCount();
+    timer.start();
+    board.swapPositions(position, board.emptyPosition);
+    notifyListeners();
   }
 
-  // List<Widget> setBoardSpaces() {
-  //   return board.setSpaces();
-  // }
-  // void _resetTimer() {
-  //   timer.reset();
-  // }
+  void increaseCount() {
+    rounds++;
+    notifyListeners();
+  }
+
+  void resetCounts() {
+    timer.reset();
+    rounds = 0;
+  }
+
+  void changeLevel(BuildContext context) async {
+    timer.stop();
+    // O usuário define o nível nas opções do dialog
+    final int? selected = await changeLevelDialog(context);
+    if (selected != null && selected != board.level) {
+      board.level = selected;
+      board.generate();
+      // list.shuffle(board.level);
+    } 
+    notifyListeners();
+    // return _timer.resume();
+  }
+
+  void restart(BuildContext context) async {
+    timer.stop();
+    if(rounds > 0) {
+      final bool? selected = await alertShuffleDialog(context);
+      // Se o usuário não confirmar
+      if(selected != true) { 
+        return;  // não deve acontece nada
+      }
+    } 
+    timer.reset();
+    board.generate();
+    rounds = 0;
+
+    notifyListeners();
+  }
+
 
   @override
   void dispose() {
+    board.dispose();
     timer.dispose();
     list.dispose();
     super.dispose();
